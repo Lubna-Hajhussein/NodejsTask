@@ -31,20 +31,45 @@ router.get("/find/:id", (req, res) => {
   });
 });
 
+
+//rest API that will get all the users with a specific type
+router.get("/findbytype/:type", (req, res) => {
+    db.User.findAll({
+      include: [db.Profile],
+      where: {
+          type: req.params.type,
+      },
+    }).then((specificUsers) =>{
+        console.log(specificUsers)
+         res.send(specificUsers)});
+  });
+
+ //rest API that will update a list of users in the system (not only one user)
+router.put("/edit", (req, res) => {
+    //by sending an array of the target users
+    const users = req.body
+    console.log(users)
+    users.forEach((user)=>{
+        db.User.update(
+            {
+              type: user.type,
+            },
+            {
+              where: {
+                id: user.id,
+              },
+            }
+          ).then(() => res.send("success"));
+    })
+  }); 
+
 router.get("/all", (req, res) => {
   db.User.findAll({
     include: [db.Profile],
   }).then((allUsers) => res.send(allUsers));
 });
 
-//rest API that will get all the users with a specific type
-router.get("/find/:type", (req, res) => {
-  db.User.findAll({
-    include: [db.Profile],
-    where: {
-      type: req.params.type,
-    },
-  }).then((specificUsers) => res.send(specificUsers));
-});
+
+
 
 module.exports = router;
